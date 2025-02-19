@@ -1,34 +1,75 @@
 #include <iostream>
 #include <grpc++/grpc++.h>
-#include "ping.grpc.pb.h"
+#include "calculator.grpc.pb.h"
 
-using grpc::ClientContext;
 using grpc::Channel;
-using grpc::CreateChannel;
-using grpc::InsecureChannelCredentials;
+using grpc::ClientContext;
 using grpc::Status;
 
 using std::cout;
 using std::endl;
+using std::invalid_argument;
 using std::shared_ptr;
 using std::unique_ptr;
 
-int main() {
-	Msg request, response;
-	request.set_payload("Hello, server!");
+class CalculatorClient
+{
+public:
+	CalculatorClient(shared_ptr<Channel> channel) : _stub(Calculator::NewStub(channel)) {}
+	float Calculate(float first, float second, char operation)
+	{
+		OperandsRequest request;
+		Response response;
+		request.set_first(first);
+		request.set_second(second);
 
-	ClientContext context;
-	std::shared_ptr<Channel> channel = grpc::CreateChannel("localhost:4000", InsecureChannelCredentials());
-	unique_ptr<Ping::Stub> stub = Ping::NewStub(channel);
+		ClientContext context;
+		Status status;
 
-	Status status = stub->ping(&context, request, &response);
+		switch (operation)
+		{
+		case '+':
+			status = this->_stub->Addition(&context, request, &response);
+			break;
+		case '-':
+			status = this->_stub->Subtraction(&context, request, &response);
+			break;
+		case '*':
+			status = this->_stub->Multiplication(&context, request, &response);
+			break;
+		case '/':
+			status = this->_stub->Division(&context, request, &response);
+			break;
+		default:
+			throw invalid_argument("Unknown operation");
+		}
 
-	if (status.ok()) {
-		cout << response.payload() << endl;
-	} 
-	else {
-		cout << status.error_code() << ": " << status.error_message() << endl;
+		if (status.ok())
+		{
+			return response.result();
+		}
+		else
+		{
+			throw invalid_argument(status.error_message());
+		}
 	}
 
+private:
+	unique_ptr<Calculator::Stub> _stub;
+};
+
+int main()
+{
+	CalculatorClient client(grpc::CreateChannel("localhost:4000", grpc::InsecureChannelCredentials()));
+	float result;
+	try
+	{
+		result = client.Calculate(5, 0, '/');
+	}
+	catch (const std::invalid_argument exception)
+	{
+		cout << "ERROR: " << exception.what() << endl;
+	}
+	cout << result << endl;
 	return 0;
 }
