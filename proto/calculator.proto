@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+message OperandsRequest {
+	float first = 1;
+	float second = 2;
+}
+
+message Response {
+	float result = 1;
+}
+
+service Calculator {
+	rpc Addition(OperandsRequest) returns (Response) {}
+	rpc Subtraction(OperandsRequest) returns (Response) {}
+	rpc Multiplication(OperandsRequest) returns (Response) {}
+	rpc Division(OperandsRequest) returns (Response) {}
+}

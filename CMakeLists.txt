@@ -13,14 +13,14 @@ set(_GRPC_GRPCPP gRPC::grpc++)
 find_program(_PROTOBUF_PROTOC protoc)
 find_program(_GRPC_CPP_PLUGIN_EXECUTABLE grpc_cpp_plugin)
 
-set(proto ping)
+set(proto calculator)
 get_filename_component(proto_path "proto/${proto}.proto" ABSOLUTE)
 get_filename_component(proto_dir "${proto_path}" PATH)
 
-set(proto_srcs "${CMAKE_CURRENT_BINARY_DIR}/ping.pb.cc")
-set(proto_hdrs "${CMAKE_CURRENT_BINARY_DIR}/ping.pb.h")
-set(grpc_srcs "${CMAKE_CURRENT_BINARY_DIR}/ping.grpc.pb.cc")
-set(grpc_hdrs "${CMAKE_CURRENT_BINARY_DIR}/ping.grpc.pb.h")
+set(proto_srcs "${CMAKE_CURRENT_BINARY_DIR}/${proto}.pb.cc")
+set(proto_hdrs "${CMAKE_CURRENT_BINARY_DIR}/${proto}.pb.h")
+set(grpc_srcs "${CMAKE_CURRENT_BINARY_DIR}/${proto}.grpc.pb.cc")
+set(grpc_hdrs "${CMAKE_CURRENT_BINARY_DIR}/${proto}.grpc.pb.h")
 add_custom_command(
     OUTPUT "${proto_srcs}" "${proto_hdrs}" "${grpc_srcs}" "${grpc_hdrs}"
     COMMAND ${_PROTOBUF_PROTOC}
