@@ -6,10 +6,12 @@ using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
 
+using std::cin;
 using std::cout;
 using std::endl;
 using std::invalid_argument;
 using std::shared_ptr;
+using std::string;
 using std::unique_ptr;
 
 class CalculatorClient
@@ -58,18 +60,69 @@ private:
 	unique_ptr<Calculator::Stub> _stub;
 };
 
+char operatorType(string expression)
+{
+	const char operators[4] = {'+', '-', '*', '/'};
+	for (int i = 0; i < 4; i++)
+	{
+		if (expression.find(operators[i]) != -1)
+		{
+			return operators[i];
+		}
+	}
+	throw invalid_argument("Invalid string format");
+}
+struct operands
+{
+	float first;
+	float second;
+};
+operands findOperands(string expression, char operatorType)
+{
+	int operatorPosition = expression.find(operatorType);
+	string firstPart = expression.substr(0, operatorPosition);
+	string secondPart = expression.substr(operatorPosition + 1);
+
+	try
+	{
+		float first = std::stof(firstPart);
+		float second = std::stof(secondPart);
+		return {first, second};
+	}
+	catch (const std::exception exception)
+	{
+		throw invalid_argument("Invalid string format");
+	}
+}
+
+void makeIteration(CalculatorClient &client)
+{
+	string expression;
+	cout << "Enter expression: ";
+	std::getline(cin, expression);
+	expression.erase(remove_if(expression.begin(), expression.end(), isspace), expression.end());
+
+	char operation = operatorType(expression);
+	operands args = findOperands(expression, operation);
+
+	float result = client.Calculate(args.first, args.second, operation);
+	cout << "Result: " << result << endl;
+}
+
 int main()
 {
 	CalculatorClient client(grpc::CreateChannel("localhost:4000", grpc::InsecureChannelCredentials()));
-	float result;
-	try
+	while (true)
 	{
-		result = client.Calculate(5, 0, '/');
+		try
+		{
+			makeIteration(client);
+		}
+		catch (const invalid_argument exception)
+		{
+			cout << "ERROR: " << exception.what() << endl;
+		}
 	}
-	catch (const std::invalid_argument exception)
-	{
-		cout << "ERROR: " << exception.what() << endl;
-	}
-	cout << result << endl;
+
 	return 0;
 }
