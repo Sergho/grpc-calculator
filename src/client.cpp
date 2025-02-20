@@ -1,6 +1,6 @@
-#include <iostream>
 #include <grpc++/grpc++.h>
 #include "calculator.grpc.pb.h"
+#include "constants.hpp"
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -13,6 +13,9 @@ using std::invalid_argument;
 using std::shared_ptr;
 using std::string;
 using std::unique_ptr;
+
+using constants::Operation;
+using constants::OperationsCount;
 
 class CalculatorClient
 {
@@ -30,16 +33,16 @@ public:
 
 		switch (operation)
 		{
-		case '+':
+		case Operation::Addition:
 			status = this->_stub->Addition(&context, request, &response);
 			break;
-		case '-':
+		case Operation::Subtraction:
 			status = this->_stub->Subtraction(&context, request, &response);
 			break;
-		case '*':
+		case Operation::Multiplication:
 			status = this->_stub->Multiplication(&context, request, &response);
 			break;
-		case '/':
+		case Operation::Division:
 			status = this->_stub->Division(&context, request, &response);
 			break;
 		default:
@@ -62,8 +65,12 @@ private:
 
 char operatorType(string expression)
 {
-	const char operators[4] = {'+', '-', '*', '/'};
-	for (int i = 0; i < 4; i++)
+	const char operators[OperationsCount] = {
+		Operation::Addition,
+		Operation::Division,
+		Operation::Multiplication,
+		Operation::Division};
+	for (int i = 0; i < OperationsCount; i++)
 	{
 		if (expression.find(operators[i]) != -1)
 		{
