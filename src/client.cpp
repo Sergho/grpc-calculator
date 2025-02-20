@@ -14,8 +14,10 @@ using std::shared_ptr;
 using std::string;
 using std::unique_ptr;
 
+using constants::InvalidFormat;
 using constants::Operation;
 using constants::OperationsCount;
+using constants::UnknownOperation;
 
 class CalculatorClient
 {
@@ -46,7 +48,7 @@ public:
 			status = this->_stub->Division(&context, request, &response);
 			break;
 		default:
-			throw invalid_argument("Unknown operation");
+			throw UnknownOperation;
 		}
 
 		if (status.ok())
@@ -77,7 +79,7 @@ char operatorType(string expression)
 			return operators[i];
 		}
 	}
-	throw invalid_argument("Invalid string format");
+	throw InvalidFormat;
 }
 struct operands
 {
@@ -98,7 +100,7 @@ operands findOperands(string expression, char operatorType)
 	}
 	catch (const std::exception exception)
 	{
-		throw invalid_argument("Invalid string format");
+		throw InvalidFormat;
 	}
 }
 
