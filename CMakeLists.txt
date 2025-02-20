@@ -46,7 +46,7 @@ target_link_libraries(grpc_proto
   ${_PROTOBUF_LIBPROTOBUF})
 
 foreach(_target client server)
-  add_executable(${_target} "${_target}.cpp")
+  add_executable(${_target} "src/${_target}.cpp")
   target_link_libraries(${_target}
     grpc_proto
     absl::check
