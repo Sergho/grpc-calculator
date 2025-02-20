@@ -1,3 +1,6 @@
+#include <iostream>
+#include <memory>
+
 #include <grpc++/grpc++.h>
 #include "calculator.grpc.pb.h"
 
@@ -50,7 +53,6 @@ void SetupServer()
 
 int main()
 {
-	std::map<char, char> mp;
 	SetupServer();
 	return 0;
 }

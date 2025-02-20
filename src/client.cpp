@@ -1,3 +1,8 @@
+#include <iostream>
+#include <memory>
+#include <string>
+#include <stdexcept>
+
 #include <grpc++/grpc++.h>
 #include "calculator.grpc.pb.h"
 #include "constants.hpp"
